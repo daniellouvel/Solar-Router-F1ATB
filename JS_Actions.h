@@ -1245,12 +1245,15 @@ function SetParaFixe(){
 
 function SetParaVar() {
     SelectActions = "<option value=255>Non exploité</option>";
+    
     for ( let esp = 0; esp < nomRMS.length; esp++) { //Liste des actions par routeur
-        for (var iAct = 0; iAct < nomActions[esp].length; iAct++) {
-            var v = esp * 10 + parseInt(nomActions[esp][iAct][0]); //Nombre refletant la référence esp et action
-            var T = (esp == 0) ? "" : nomRMS[esp] + " / ";
-            SelectActions += "<option value=" + v + ">" + T + nomActions[esp][iAct][1] + "</option>";
-            ListeActions[v] = T + nomActions[esp][iAct][1];
+        if(nomActions[esp]){
+            for (var iAct = 0; iAct < nomActions[esp].length; iAct++) {
+                var v = esp * 10 + parseInt(nomActions[esp][iAct][0]); //Nombre refletant la référence esp et action
+                var T = (esp == 0) ? "" : nomRMS[esp] + " / ";
+                SelectActions += "<option value=" + v + ">" + T + nomActions[esp][iAct][1] + "</option>";
+                ListeActions[v] = T + nomActions[esp][iAct][1];
+            }
         }
     }
     TraceActions(false);

@@ -60,17 +60,19 @@ void CallESP32_Externe() {
       idx++;
     }
     Gr[idx] = RMSExtDataB;
+ 
     idx = 0;
     for (int i = 0; i < 3; i++) {
       while (Gr[i].indexOf(RS) >= 0) {
         Sval = Gr[i].substring(0, Gr[i].indexOf(RS));
         Gr[i] = Gr[i].substring(Gr[i].indexOf(RS) + 1);
         data_[idx] = Sval;
-        idx++;
+        if (idx<21) idx++;
       }
       data_[idx] = Gr[i];
-      idx++;
+      if (idx<21) idx++;
     }
+    
     for (int i = 0; i <= idx; i++) {
       switch (i) {
         case 0:
@@ -149,6 +151,40 @@ void CallESP32_Externe() {
           break;
       }
     }
+    String G = Gr[3];
+    String val[10];
+    int p1= G.indexOf(FS);
+    if (p1>=0){ //Vérifie présence du groupe pour gestion partie triphasé
+      G= G.substring(p1+1);
+      G = G.substring(0, G.indexOf(FS));
+      int j = 0;
+      // découpe complète
+      while (G.indexOf(RS) >= 0 && j < 10) {
+        val[j++] = G.substring(0, G.indexOf(RS));
+        G = G.substring(G.indexOf(RS) + 1);
+      }
+      if (j < 10) {
+        val[j++] = G;  // dernier élément
+      }
+      // --- PARTIE FIXE (toujours présente) ---
+      if (j >= 8) {
+        Tension_M   = val[0].toFloat();
+        Intensite_M = val[1].toFloat();
+        Tension_M1  = val[2].toFloat();
+        Intensite_M1= val[3].toFloat();
+        Tension_M2  = val[4].toFloat();
+        Intensite_M2= val[5].toFloat();
+        Tension_M3  = val[6].toFloat();
+        Intensite_M3= val[7].toFloat();
+      }
+      // --- PARTIE OPTIONNELLE (énergies T) ---
+      if (j >= 10) {
+        Tension_T = val[8].toFloat();
+        Intensite_T = val[9].toFloat();
+      }
+    }
+
+
     RMSExtDataB = "";
   }
 }

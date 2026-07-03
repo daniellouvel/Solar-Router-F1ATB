@@ -362,20 +362,22 @@ function SetParaVar() {
   LoadHisto10mn();
   EtatActions(0, 0);
   let S = "";
-  for (let c = 1; c < V.IP_RMS.length; c++) { 
-    S += "<div class='autreRMS'><div>" + V.IP_RMS[c] + "</div><div>" +nomRMS[c] + "</div><div id='autreRid" + c + "' onclick='autreRclick(" + c + ");' style='cursor:pointer;' ></div></div>";
-    S += "<div class='autreRif' id='autreRif" + c + "'></div>";
+  if (V.IP_RMS){
+    for (let c = 1; c < V.IP_RMS.length; c++) { 
+      S += "<div class='autreRMS'><div>" + V.IP_RMS[c] + "</div><div>" +nomRMS[c] + "</div><div id='autreRid" + c + "' onclick='autreRclick(" + c + ");' style='cursor:pointer;' ></div></div>";
+      S += "<div class='autreRif' id='autreRif" + c + "'></div>";
+    }
   }
   GH("autresRMS", S);
   
   const IPextDisp = int2ip(F.RMSextIP);
   let IdsxSource = -1;
-  
-  for (let c = 1; c < V.IP_RMS.length; c++) { 
-    if (V.IP_RMS[c] === IPextDisp) IdsxSource = c; 
-    autreRaffiche(c);
+  if(V.IP_RMS){
+    for (let c = 1; c < V.IP_RMS.length; c++) { 
+      if (V.IP_RMS[c] === IPextDisp) IdsxSource = c; 
+      autreRaffiche(c);
+    }
   }
-  
   S = 'Source : ';
   if (F.Source === "Ext") { 
     S += 'ESP distant ' + IPextDisp;

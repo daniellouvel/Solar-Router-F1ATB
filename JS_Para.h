@@ -162,6 +162,14 @@ function SetParaFixe() {
     LoadParaVar();
     GID("LesParas").style.display="block";
 
+    let Pay='<form action="https://www.paypal.com/donate" method="post" target="_top">';
+      Pay +='<input type="hidden" name="hosted_button_id" value="Z35E9D5D9N9DN">';
+      Pay +='<input class="don" type="image" src="https://pics.paypal.com/00/s/MGY1NzdhY2YtYTRkNi00YzIwLWI2YzQtNWI3YjM3ZmFiNWUx/file.PNG"';
+      Pay +=' style="border:0;" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Bouton Faites un don avec PayPal">';
+      Pay +='<img alt="" class="donNone" style="border:0;"  src="https://www.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1">';
+    Pay +='</form>';
+    if (F.ModeReseau != 2) GH("donEnv",Pay);
+
 }
 
 /**
@@ -315,7 +323,9 @@ function checkDisabled() {
     // Visibilité DHCP
     GID("dhcp").style.visibility = (F.ModeReseau == 2) ? "hidden" : "visible";
     GID("ipreset").style.display = (F.ModeReseau == 2) ? "none" : "inherit";
+
     
+
     const isESPTypeEcran = ((pESP >= 4 && pESP<=9 ) || pESP==101);
     GID("rotation").style.display = isESPTypeEcran ? "table-row" : "none";
     GID("dureeOn").style.display = isESPTypeEcran ? "table-row" : "none";
@@ -512,25 +522,26 @@ function SetParaVar() {
     let Soptions = "";
     
     // Boucle pour remplir les IP/Noms des routeurs et construire les options de sélection
-    for (let c = 0; c < nb_ESP; c++) {
-        GID(`RMS_IP${c}`).value = V.IP_RMS[c];
-        GH(`RMS_Nom${c}`, nomRMS[c]);
-        GID(`Routeur_${c}`).style.display = "table-row"; 
-        
-        // Ajout des options pour les sélecteurs de température (exclut RMS_IP0, qui est l'IP locale)
-        if (c > 0) {
-            Soptions += `<option value=${c}>${V.IP_RMS[c]} ${nomRMS[c]}</option>`;
-        }
-        
-        // Affichage de la ligne suivante (avec indication) pour permettre l'ajout d'une nouvelle IP
-        const d = c + 1;
-        if (c < 7) {
-            GH("RMS_Nom" + d, "<small>Ajoutez une adresse IP de routeur ----></small>");
-            // Correction: Utiliser style.display
-            GID("Routeur_" + d).style.display = "table-row";
+    if(V.IP_RMS){
+        for (let c = 0; c < nb_ESP; c++) {
+            GID(`RMS_IP${c}`).value = V.IP_RMS[c];
+            GH(`RMS_Nom${c}`, nomRMS[c]);
+            GID(`Routeur_${c}`).style.display = "table-row"; 
+            
+            // Ajout des options pour les sélecteurs de température (exclut RMS_IP0, qui est l'IP locale)
+            if (c > 0) {
+                Soptions += `<option value=${c}>${V.IP_RMS[c]} ${nomRMS[c]}</option>`;
+            }
+            
+            // Affichage de la ligne suivante (avec indication) pour permettre l'ajout d'une nouvelle IP
+            const d = c + 1;
+            if (c < 7) {
+                GH("RMS_Nom" + d, "<small>Ajoutez une adresse IP de routeur ----></small>");
+                // Correction: Utiliser style.display
+                GID("Routeur_" + d).style.display = "table-row";
+            }
         }
     }
-
     // Mise à jour des sélecteurs de température externe
     for (let i = 0; i < 4; i++) {
         GH("refTempIP" + i, Soptions);

@@ -415,8 +415,20 @@ void handleAjaxData() {  // Données page d'accueil
   if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3)) {  // UxIx2 ou Shelly monophasé avec 2 sondes
     S += GS + String(PuissanceS_T) + RS + String(PuissanceI_T) + RS + String(PVAS_T) + RS + String(PVAI_T);
     S += RS + String(EnergieJour_T_Soutiree) + RS + String(EnergieJour_T_Injectee) + RS + String(Energie_T_Soutiree) + RS + String(Energie_T_Injectee);
+  } else {
+    S +=GS +"Fake";
   }
-  S += GS + "Fin\r";
+  // --- NOUVEAU GROUPE --- MC gestion du triphasé
+	S += GS +FS
+    + String(Tension_M) + RS + String(Intensite_M)
+    + RS + String(Tension_M1) + RS + String(Intensite_M1)
+    + RS + String(Tension_M2) + RS + String(Intensite_M2)
+    + RS + String(Tension_M3) + RS + String(Intensite_M3);
+	if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3)) {  // UxIx2 ou Shelly monophasé avec 2 sondes
+    S += RS + String(Tension_T) + RS + String(Intensite_T) ;
+	}
+// --- FIN ---
+  S += FS + "Fin\r";
 
   server.send(200, "text/html", S);
 }

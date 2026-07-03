@@ -20,6 +20,8 @@ const char *ParaCommunJS = R"====(
              GH("version",`${V.toFixed(2)} | Source : ${F.Source}`);
              document.title=`${F.nomRouteur} - ${document.title}`;
              SetParaFixe();
+             //OTA
+              GID("Bota").style.display = (F.ModeReseau == 2) ? "none" : "inline-block";
            }         
         };
         xhttp.open('GET', '/ParaFixe', true);
@@ -30,19 +32,21 @@ const char *ParaCommunJS = R"====(
         xhttp.onreadystatechange = function() { 
           if (this.readyState == 4 && this.status == 200) {
              V=JSON.parse(this.responseText);             
-             AdaptationSource();  
-             V.IP_RMS[0] = V.localIP; //Valeur à jour qui a pu changer par DHCP
-             nb_ESP=V.RMS_NomEtat.length;
-             for (let c=0;c<nb_ESP;c++){
-              V.RMS_NomEtat[c]=decodeURIComponent(V.RMS_NomEtat[c]);
-              let ip_nom=V.RMS_NomEtat[c].split(US); 
-              nomRMS[c]=ip_nom[0];
-              //ip_nom[1] les températures n'est plus utilisé
-              let lesNomsActions=ip_nom[2].split(FS);
-              nomActions[c]=[]; 
-              for (let i=0;i<lesNomsActions.length -1;i++){
-                  let Nact=lesNomsActions[i].split(ES);
-                  nomActions[c][i]=Nact;
+             AdaptationSource(); 
+             if (V.IP_RMS) {
+              V.IP_RMS[0] = V.localIP; //Valeur à jour qui a pu changer par DHCP
+              nb_ESP=V.RMS_NomEtat.length;
+              for (let c=0;c<nb_ESP;c++){
+                V.RMS_NomEtat[c]=decodeURIComponent(V.RMS_NomEtat[c]);
+                let ip_nom=V.RMS_NomEtat[c].split(US); 
+                nomRMS[c]=ip_nom[0];
+                //ip_nom[1] les températures n'est plus utilisé
+                let lesNomsActions=ip_nom[2].split(FS);
+                nomActions[c]=[]; 
+                for (let i=0;i<lesNomsActions.length -1;i++){
+                    let Nact=lesNomsActions[i].split(ES);
+                    nomActions[c][i]=Nact;
+                }
               }
              }
              nomRMS[0] = nomRMS[0] +" (local)";
@@ -69,7 +73,7 @@ const char *ParaCommunJS = R"====(
   }
   function SetHautBas(){
       let S="<div class='onglets'><div class='Bonglet Baccueil'><a href='/'>Accueil</a></div><div class='Bonglet Bbrut'><a href='/Brute'>Donn&eacute;es brutes</a></div><div class='Bonglet Bparametres'><a href='/Para'>Param&egrave;tres</a></div><div class='Bonglet Bactions'><a href='/Actions'>Actions</a></div></div>";
-      S +="<div id='onglets2'><div class='Bonglet2 Bgeneraux'><a href='/Para'>Généraux</a></div><div class='Bonglet2 Bheure' ><a href='/Heure'>Heure</a></div><div class='Bonglet2 Bexport'><a href='/Export'>Import / Export</a></div><div class='Bonglet2 Bota'><a href='/OTA'>Mise à jour par OTA</a></div>";
+      S +="<div id='onglets2'><div class='Bonglet2 Bgeneraux'><a href='/Para'>Généraux</a></div><div class='Bonglet2 Bheure' ><a href='/Heure'>Heure</a></div><div class='Bonglet2 Bexport'><a href='/Export'>Import / Export</a></div><div class='Bonglet2 Bota' id='Bota'><a href='/OTA'>Mise à jour par OTA</a></div>";
       S +="<div id='Bwifi' class='Bonglet2 Bwifi'><a href='/Wifi'>WIFI</a></div><div class='Bonglet2 Bcouleurs'><a href='/Couleurs'>Couleurs</a></div></div>";
       S +="<h2 id='nom_R'>Routeur Solaire - RMS</h2>";
       GH("lesOnglets",S);
