@@ -1,5 +1,21 @@
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
+#include "soc/soc_caps.h"
+
+// HSPI_HOST/VSPI_HOST n'existent nativement que sur l'ESP32 classique.
+// Sur S2/S3/C3 ils ne sont pas définis par le SDK : on les ramène sur
+// les hôtes SPI génériques disponibles (SPI2/SPI3), en repliant sur
+// SPI2 seul sur les puces (comme le C3) qui n'ont qu'un seul SPI usage général.
+#ifndef HSPI_HOST
+#define HSPI_HOST SPI2_HOST
+#endif
+#ifndef VSPI_HOST
+#if SOC_SPI_PERIPH_NUM > 2
+#define VSPI_HOST SPI3_HOST
+#else
+#define VSPI_HOST SPI2_HOST
+#endif
+#endif
 
 //******************************************
 // Equivalence ESP32_Type et ScreenType

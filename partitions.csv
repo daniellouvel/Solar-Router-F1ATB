@@ -1,7 +1,10 @@
 # Name,   Type, SubType, Offset,  Size, Flags
+# Table pour ESP32-C3 SuperMini (4MB flash). Le firmware compile fait
+# ~1.97MB : il ne tient pas dans un schema a 2 slots OTA de 1900K sur
+# une puce 4MB (voir partitions_s3_16mb.csv pour la cible S3 qui garde
+# l'OTA A/B classique). Ici on utilise un seul slot d'appli, plus grand.
 nvs,      data, nvs,     36K,     20K,
-otadata,  data, ota,  56K,     8K,
-app0,     app,  ota_0,   ,      1900K,
-app1,     app,  ota_1,   ,      1900K,
+otadata,  data, ota,     56K,     8K,
+app0,     app,  ota_0,   ,        3200K,
 coredump, data, coredump,  , 64K,
 spiffs,data,spiffs,,140K,

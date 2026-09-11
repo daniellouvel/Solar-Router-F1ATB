@@ -810,7 +810,10 @@ uint8_t bestBSSID[6];  //Meilleur en dBm adresse MAC
 
 //Ethernet
 int16_t EthernetBug = 0;
+#if CONFIG_ETH_USE_ESP32_EMAC  //EMAC (PHY_LAN8720) uniquement présent sur l'ESP32 classique (WT32-ETH01), pas sur S2/S3/C3
+#include <utility/EMACDriver.h>
 EMACDriver driver(ETH_PHY_LAN8720, 23, 18, 16);  //
+#endif
 
 WebServer server(80);  // Simple Web Server on port 80
 
@@ -1061,7 +1064,7 @@ void setup() {
   }
   for (int i = 0; i < LES_ROUTEURS_MAX; i++) {
     RMS_IP[i] = 0;  //IP du reseau
-    RMS_NomEtat[LES_ROUTEURS_MAX]="";
+    RMS_NomEtat[i] = "";
     RMS_Note[i] = 0;
     RMS_NbCx[i] = 0;
   }
@@ -1076,7 +1079,9 @@ void setup() {
   delay(100);
   MessageCommandes();
   LireSerial();
+#if CONFIG_ETH_USE_ESP32_EMAC
   Ethernet.init(driver);
+#endif
   if (String(ESP.getChipModel()) == "ESP32-D0WD") {  //certains ESP32U et WT32-ETH01
     TelnetPrintln("\nAncien modèle d'ESP32 que l'on trouve sur les cartes Ethernet WT32-ETH01 (branchez le câble) et certains ESP32U");
     if (Ethernet.begin() != 0) {  //C'est une carte WT-ETH01
@@ -1142,6 +1147,12 @@ void setup() {
     delay(500);
     //Liste Wifi à faire avant connexion à un AP. Necessaire depuis biblio ESP32 3.0.1
     WiFi.mode(WIFI_STA);
+#if CONFIG_IDF_TARGET_ESP32C3
+    // Défaut matériel connu sur les 1ers lots d'ESP32-C3 SuperMini (antenne mal adaptée,
+    // réflexions qui empêchent l'association WiFi en pleine puissance). Réduire la
+    // puissance d'émission contourne le problème. Sans effet sur les autres cartes.
+    WiFi.setTxPower(WIFI_POWER_8_5dBm);
+#endif
     WiFi.disconnect();
     WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
     WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);
