@@ -81,7 +81,7 @@ const char *OtaHtml = R"====(
         }
         function SetParaFixe(){
           GID("Bwifi").style.display= (F.ESP32_Type!=10) ? "inline-block": "none";
-          GH("Version_actu", F.VersionStocke);
+          GH("Version_actu", F.VersionStocke + "-dl");
           Set_Couleurs();
         }
     </script>
