@@ -106,8 +106,10 @@ partout où le code distingue WiFi/Ethernet/écran par plage de valeurs numériq
 
 ## 7. Mesure Maison et/ou Triac via MQTT sur un message multi-canaux
 
-Motivation : certains capteurs (ex: Shelly Pro 3EM) publient un **tableau JSON** avec
-plusieurs canaux nommés, par exemple :
+Motivation : cette fonctionnalité a été ajoutée pour pouvoir exploiter les valeurs
+remontées en MQTT par [EnergyMe](https://www.energyme.net/), un moniteur d'énergie
+open-source multi-canaux. Comme d'autres capteurs multi-canaux (ex: Shelly Pro 3EM),
+EnergyMe publie un **tableau JSON** avec plusieurs canaux nommés, par exemple :
 
 ```json
 [
