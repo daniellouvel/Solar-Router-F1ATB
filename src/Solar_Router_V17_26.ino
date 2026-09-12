@@ -1,4 +1,4 @@
-#define Version "17.26"  //
+#define Version "17.26-dl"  // Fork daniellouvel (S3/C3 + EnergyMe) - distinct de la numérotation officielle F1ATB
 #define HOSTNAME "RMS-ESP32-"
 
 
