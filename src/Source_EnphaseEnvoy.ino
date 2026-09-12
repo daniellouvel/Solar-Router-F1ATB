@@ -390,6 +390,27 @@ float ValJson(String nom, String Json) {
   }
   return val;
 }
+
+// Cherche, dans un message JSON contenant plusieurs objets similaires (ex: un tableau de canaux de
+// mesure), la position juste après le bloc dont la clé "nomCle" vaut "valeurCherchee"
+// (ex: nomCle="label", valeurCherchee="Cumulus"). Tolère un espace optionnel après le ":".
+// Renvoie -1 si non trouvé.
+int TrouveBloc(String nomCle, String valeurCherchee, String Json) {
+  String cle = "\"" + nomCle + "\"";
+  int depart = 0;
+  while (true) {
+    int p = Json.indexOf(cle, depart);
+    if (p < 0) return -1;
+    int q = Json.indexOf(":", p + cle.length());
+    if (q < 0) return -1;
+    int q1 = Json.indexOf("\"", q + 1);
+    if (q1 < 0) return -1;
+    int q2 = Json.indexOf("\"", q1 + 1);
+    if (q2 < 0) return -1;
+    if (Json.substring(q1 + 1, q2) == valeurCherchee) return q2 + 1;
+    depart = q2 + 1;
+  }
+}
 long LongJson(String nom, String Json) {  // Pour éviter des problèmes d'overflow
   int p = Json.indexOf(nom + "\":");
   Json = Json.substring(p);

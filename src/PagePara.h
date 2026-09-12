@@ -103,6 +103,16 @@ const char *ParaHtml = R"====(
                 onclick="checkDisabled();">
         </div>
 
+        <div class="ligne" id="l_wifi_TopicIT">
+          <label for="TopicIT">MQTT Topic Intensité Triac <small>(capteur séparé, optionnel, indépendant de la Source)</small> :</label>
+          <input type="text" id="TopicIT" name="TopicIT" onchange="checkDisabled();" autocomplete="on">
+        </div>
+
+        <div class="ligne" id="l_wifi_LabelIT">
+          <label for="LabelIT">Nom du canal dans le message JSON <small>(si plusieurs canaux, ex: "Cumulus")</small> :</label>
+          <input type="text" id="LabelIT" name="LabelIT" autocomplete="on">
+        </div>
+
         <div class="ligne" id="l_wifi_2">
           <label for="WifiSleep">
             Wifi Sleep/veille <small>(réduit la consommation mais ralentit la communication)</small> 
@@ -139,6 +149,8 @@ const char *ParaHtml = R"====(
             <option value="9">Ecran JC2432W328 C_ST7789</option>
             <option value="101">Ecran ESP32-2432S032C ST7789</option>
             <option value="10">WT32-ETH01</option>
+            <option value="102">ESP32-C3 SuperMini</option>
+            <option value="103">ESP32-S3 N16R8</option>
           </select>
         </div>
 
@@ -396,6 +408,11 @@ const char *ParaHtml = R"====(
         <div class="ligne" id="ligneTopicP">
           <label for="TopicP">MQTT Topic Puissance :</label>
           <input type="text" id="TopicP" name="TopicP" autocomplete="on">
+        </div>
+
+        <div class="ligne" id="ligneLabelP">
+          <label for="LabelP">Nom du canal dans le message JSON <small>(si plusieurs canaux, laisser vide pour le format simple {"Pw":...})</small> :</label>
+          <input type="text" id="LabelP" name="LabelP" autocomplete="on">
         </div>
 
         <div><span class="fsize10">Nécessite un Restart de l'ESP32</span></div>

@@ -321,9 +321,9 @@
   - Version 17.25
     Fourniture (nouvelle version) dans le message Source externe des tensions et courants pour la variante du programme adaptée aux Véhicules Electriques 
   - Version 17.26
-    Suppression page OTA pour les routeurs non connectés à Internet 
+    Suppression page OTA pour les routeurs non connectés à Internet
 
- 
+
 
 
   Les détails sont disponibles sur / Details are available here:
@@ -436,6 +436,9 @@ byte ESP32_Type = 0;                                                    //0=Inco
                                                                         //8 = Ecran 320*240 ST7789/BL27  2.4pouces capacitif
                                                                         //9 = Ecran 320*240 ST7789/BL27  2.8pouces capacitif
                                                                         //10 = ESP32-ETH01
+                                                                        //101 = Ecran ESP32-2432S032C ST7789 capacitif
+                                                                        //102 = ESP32-C3 SuperMini
+                                                                        //103 = ESP32-S3 N16R8
 byte LEDgroupe = 0;                                                     //0:pas de LED,1à9 pour les LED. 10 et 11 pour les écrans  OLED
 byte LEDyellow[] = { 0, 18, 4, 2, 4, 0, 0, 0, 0, 0, 18, 4, 18, 4 };     //Ou SDA pour OLED
 byte LEDgreen[] = { 0, 19, 16, 4, 17, 0, 0, 0, 0, 0, 19, 32, 19, 32 };  //ou SCL pour OLED
@@ -689,6 +692,13 @@ String P_MQTT_Brute = "";
 float PwMQTT = 0;
 float PvaMQTT = 0;
 float PfMQTT = 1;
+//"label" optionnel du canal Maison à repérer dans TopicP, si celui-ci est un message multi-canaux
+//(ex: Shelly Pro 3EM). Vide = format simple d'origine {"Pw":...}.
+String LabelP = "";
+//Mesure Triac via un topic MQTT dédié, indépendant de Source (ex: capteur multi-canaux séparé)
+String TopicIT = "";               //Topic MQTT de la mesure Triac
+String LabelIT = "";                //"label" du canal à repérer dans le message (tableau JSON multi-canaux)
+unsigned long LastTriacMQTTMillis = 0;
 
 //Paramètres pour RTE
 byte TempoRTEon = 0;
@@ -1182,7 +1192,7 @@ void setup() {
 
 
   //WIFI
-  if (ESP32_Type < 10 || ESP32_Type == 101) {
+  if (ESP32_Type < 10 || ESP32_Type == 101 || ESP32_Type == 102 || ESP32_Type == 103) {
     if (ModeReseau < 2) {
       TelnetPrintln("ssid:" + ssid);
       TelnetPrintln("password:" + password);
@@ -1620,7 +1630,7 @@ void loop() {
     JourHeureChange();
 
     TelnetPrintln("\nDate : " + DATE);
-    if (ESP32_Type < 10 || ESP32_Type == 101) {  //ESP32 en WIFI
+    if (ESP32_Type < 10 || ESP32_Type == 101 || ESP32_Type == 102 || ESP32_Type == 103) {  //ESP32 en WIFI
       if (WiFi.getMode() == WIFI_STA) {
         if (WiFi.waitForConnectResult(10000) != WL_CONNECTED) {
           StockMessage("WIFI Connection Failed! #" + String(WIFIbug));

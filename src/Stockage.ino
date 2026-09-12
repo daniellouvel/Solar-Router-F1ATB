@@ -322,6 +322,9 @@ void DeserializeConfiguration(String json) {
   MQTTPrefixEtat = conf["MQTTPrefixEtat"].as<String>();
   MQTTdeviceName = conf["MQTTdeviceName"].as<String>();
   TopicP = conf["TopicP"].as<String>();
+  LabelP = conf["LabelP"] | LabelP;
+  TopicIT = conf["TopicIT"] | TopicIT;
+  LabelIT = conf["LabelIT"] | LabelIT;
   subMQTT = conf["subMQTT"];
   nomRouteur = conf["nomRouteur"].as<String>();
   nomSondeFixe = conf["nomSondeFixe"].as<String>();
@@ -457,6 +460,9 @@ String SerializeConfiguration() {
   conf["MQTTPrefixEtat"] = MQTTPrefixEtat;
   conf["MQTTdeviceName"] = MQTTdeviceName;
   conf["TopicP"] = TopicP;
+  conf["LabelP"] = LabelP;
+  conf["TopicIT"] = TopicIT;
+  conf["LabelIT"] = LabelIT;
   conf["subMQTT"] = subMQTT;
   conf["nomRouteur"] = nomRouteur;
   conf["nomSondeFixe"] = nomSondeFixe;
@@ -567,7 +573,7 @@ void Record_Data(String dateAMJ, String MesSage, int16_t HeureCouranteDeci_) {
   }
   String AM_file = "/Mois_Wh_" + dateAMJ.substring(0, 6) + ".csv";
   bool biSonde = false;
-  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3))) biSonde = true;
+  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0)) biSonde = true;
 
   String New_Record_Conf = "Date";
 

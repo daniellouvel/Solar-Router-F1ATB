@@ -165,7 +165,7 @@ void handleWifi() {
 }
 void handleMainJS1() {                  // Code Javascript
   String S = "var biSonde=false;\r\n";  // Pour tracer immediatement tableau Mesures
-  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3))) {
+  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0)) {
     S = "var biSonde=true;\r\n";
   }
 
@@ -298,6 +298,9 @@ void handleAjaxRMS() {  // Envoi des dernières données  brutes reçues du RMS
     }
     if (Source_data == "Pmqtt") {
       S += GS + P_MQTT_Brute;
+      if (TopicIT.length() > 0) {  // Mesure Triac via un topic MQTT dédié
+        S += GS + String(Tension_T) + RS + String(Intensite_T) + RS + String(PuissanceS_T - PuissanceI_T) + RS + String(PowerFactor_T) + RS + String(Energie_T_Soutiree) + RS + String(Energie_T_Injectee);
+      }
     }
   }
 
@@ -412,7 +415,7 @@ void handleAjaxData() {  // Données page d'accueil
   S = "Deb" + RS + DateLast + RS + Source_data + RS + LTARF + RS + STGEt + RS + S + RS + String(Pva_valide);
   S += GS + String(PuissanceS_M) + RS + String(PuissanceI_M) + RS + String(PVAS_M) + RS + String(PVAI_M);
   S += RS + String(EnergieJour_M_Soutiree) + RS + String(EnergieJour_M_Injectee) + RS + String(Energie_M_Soutiree) + RS + String(Energie_M_Injectee);
-  if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3)) {  // UxIx2 ou Shelly monophasé avec 2 sondes
+  if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0) {  // UxIx2, Shelly monophasé avec 2 sondes, ou mesure Triac via MQTT dédié
     S += GS + String(PuissanceS_T) + RS + String(PuissanceI_T) + RS + String(PVAS_T) + RS + String(PVAI_T);
     S += RS + String(EnergieJour_T_Soutiree) + RS + String(EnergieJour_T_Injectee) + RS + String(Energie_T_Soutiree) + RS + String(Energie_T_Injectee);
   } else {
@@ -424,7 +427,7 @@ void handleAjaxData() {  // Données page d'accueil
     + RS + String(Tension_M1) + RS + String(Intensite_M1)
     + RS + String(Tension_M2) + RS + String(Intensite_M2)
     + RS + String(Tension_M3) + RS + String(Intensite_M3);
-	if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3)) {  // UxIx2 ou Shelly monophasé avec 2 sondes
+	if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0) {  // UxIx2, Shelly monophasé avec 2 sondes, ou mesure Triac via MQTT dédié
     S += RS + String(Tension_T) + RS + String(Intensite_T) ;
 	}
 // --- FIN ---
@@ -595,6 +598,10 @@ void handlePinsActionsJS() {  // Pins disponibles
     S= "var Pins=[0,4,5,16,17,18,19,21,22,23,-1];"; //Ecran 2.8 capacitif
   if (ESP32_Type == 10)
     S = "var Pins=[0,5,12,14,17,32,33,-1];";
+  if (ESP32_Type == 102)  // ESP32-C3 SuperMini : hors GPIO2/8/9 (strapping) et 18/19 (USB natif)
+    S = "var Pins=[0,1,3,4,5,6,7,10,20,21,-1];";
+  if (ESP32_Type == 103)  // ESP32-S3 N16R8 : hors GPIO0/3/45/46/48 (strapping/LED), 19/20 (USB), 26-37 (flash+PSRAM octal), 43/44 (UART0)
+    S = "var Pins=[1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,21,38,39,40,41,42,47,-1];";
 
   server.send(200, "text/javascript", S);
 }

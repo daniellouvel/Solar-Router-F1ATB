@@ -114,6 +114,9 @@ function SetParaFixe() {
     GID("EnphasePwd").value = F.EnphasePwd;
     GID("EnphaseSerial").value = F.EnphaseSerial;
     GID("TopicP").value = F.TopicP;
+    GID("LabelP").value = F.LabelP;
+    GID("TopicIT").value = F.TopicIT;
+    GID("LabelIT").value = F.LabelIT;
     GID("MQTTRepet").value = F.MQTTRepet;
     GID("MQTTIP").value = int2ip(F.MQTTIP);
     GID("MQTTPort").value = F.MQTTPort;
@@ -227,6 +230,9 @@ function SendValues() {
   F.MQTTPrefixEtat = GID("MQTTPrefixEtat").value.trim();
   F.MQTTdeviceName = GID("MQTTdeviceName").value.trim();
   F.TopicP= GID("TopicP").value.trim();
+  F.LabelP = GID("LabelP").value.trim();
+  F.TopicIT = GID("TopicIT").value.trim();
+  F.LabelIT = GID("LabelIT").value.trim();
   F.nomRouteur = GID("nomRouteur").value.trim();
   F.nomSondeFixe = GID("nomSondeFixe").value.trim();
   F.nomSondeMobile = GID("nomSondeMobile").value.trim();
@@ -337,6 +343,8 @@ function checkDisabled() {
     // Lignes de WiFi (visibilité)
     GID("l_wifi_0").style.display = (F.ModeReseau == 2) ? "none" : "table-row";
     GID("l_wifi_1").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
+    GID("l_wifi_TopicIT").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
+    GID("l_wifi_LabelIT").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
     GID("l_wifi_2").style.display = (F.ModeReseau == 2 || F.ModePara == 0 || F.ESP32_Type == 10) ? "none" : "table-row";
 
     // Visibilité de la liste des routeurs
@@ -387,7 +395,7 @@ function checkDisabled() {
     }
 
     // Visibilité du bloc MQTT
-    const isMqttVisible = (GID("MQTTRepet").value != 0 || GID("sources").value == "Pmqtt" || GID("subMQTT").checked) && F.ModePara > 0;
+    const isMqttVisible = (GID("MQTTRepet").value != 0 || GID("sources").value == "Pmqtt" || GID("subMQTT").checked || GID("TopicIT").value.trim().length > 0) && F.ModePara > 0;
     GID("Zmqtt").style.display = isMqttVisible ? "block" : "none";
     
     // Visibilité des paramètres de température et de la surveillance
@@ -418,6 +426,7 @@ function checkDisabled() {
     
     // Visibilité du Topic de Puissance (pour source 11/MQTT)
     GID('ligneTopicP').style.display = (GID("sources").value == "Pmqtt") ? "table-row" : "none";
+    GID('ligneLabelP').style.display = (GID("sources").value == "Pmqtt") ? "table-row" : "none";
     
     // Mise à jour et appel final
     F.Source = GID("sources").value;
@@ -459,7 +468,7 @@ function checkIP(id) {
  */
 function AdaptationSource() {
     // Visibilité des options de nom (Fixe)
-    const isSourceDual = (V.Source_data === 'UxIx2' || ((V.Source_data === 'ShellyEm' || V.Source_data === 'ShellyPro') && GID("EnphaseSerial").value != 3));
+    const isSourceDual = (V.Source_data === 'UxIx2' || ((V.Source_data === 'ShellyEm' || V.Source_data === 'ShellyPro') && GID("EnphaseSerial").value != 3) || GID("TopicIT").value.trim().length > 0);
     GID('ligneFixe').style.display = isSourceDual ? "table-row" : "none";
     GID('ligneFixe1').style.display = isSourceDual ? "table-row" : "none";
     GID('ligneFixe2').style.display = isSourceDual ? "table-row" : "none";

@@ -167,10 +167,14 @@ function LoadDataESP32() {
           "Ecran ESP32-2432S024C C_ILI9341",
           "Ecran JC2432W328 C_ST7789",
           "ESP32-ETH01",
-          "Ecran ESP32-2432S032C ST7789"
+          "Ecran ESP32-2432S032C ST7789",
+          "ESP32-C3 SuperMini",
+          "ESP32-S3 N16R8"
         ];
 
        if(message[1]==101) message[1]=11; //Carte graphique au dela de 100
+       if(message[1]==102) message[1]=12;
+       if(message[1]==103) message[1]=13;
 
         S+='<tr><td>ESP32 On depuis :</td><td>'+H+'</td></tr>';
         S+='<tr><td>ESP32 modèle :</td><td>'+typeESP32[message[1]]+'</td></tr>';
