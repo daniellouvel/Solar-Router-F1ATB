@@ -1,4 +1,9 @@
 #include <Arduino.h>
+// Vrai si une mesure Triac est disponible indépendamment de Source, via un topic MQTT dédié
+// (TopicIT) ou via un second canal EnergyMe (LabelIT) sur le même appareil que la Source.
+bool TriacIndependant() {
+  return TopicIT.length() > 0 || (LabelIT.length() > 0 && (Source == "EnergyMe" || EnergyMeIP_T > 0));
+}
 void SplitS(String Str, String &Before, String Separ, String &After) {
   int p = Str.indexOf(Separ);
   Before = Str.substring(0, p);

@@ -152,9 +152,70 @@ appareils différents) — les deux abonnements et traitements sont indépendant
   mensuel d'historique, découverte/publication Home Assistant (`Intensite_T`, `Tension_T`,
   etc.), page "données brutes".
 
-## 8. Fichiers modifiés
+## 8. Source "EnergyMe" : lecture directe en HTTP (sans MQTT)
+
+Motivation : pouvoir lire les mêmes données [EnergyMe](https://www.energyme.net/) qu'en
+§7, mais sans dépendre d'un broker MQTT — le routeur interroge directement l'API REST du
+boîtier EnergyMe. Nouvelle valeur `Source = "EnergyMe"` (`src/Source_EnergyMe.ino`).
+
+### Authentification HTTP Digest
+
+L'API EnergyMe (`GET /api/v1/ade7953/meter-values`, [swagger.yaml](https://raw.githubusercontent.com/jibrilsharafi/EnergyMe-Home/main/source/resources/swagger.yaml))
+est protégée par **HTTP Digest** (RFC 2617, MD5, `qop=auth`) dès qu'un mot de passe non
+défaut est configuré sur l'appareil — pas de Basic, pas de cookie. `HTTPClient` du core
+Arduino-ESP32 ne supporte que Basic ; l'implémentation est donc manuelle
+(`MD5Builder` pour HA1/HA2/response) dans `Source_EnergyMe.ino`.
+
+**Point important, découvert en test réel sur le C3** : refaire le handshake Digest complet
+(2 requêtes réseau : la 1ère pour obtenir `realm`/`nonce`/`opaque` dans le 401, la 2nde pour
+la requête authentifiée) à **chaque lecture** rendait le routeur inutilisable (serveur web
+qui ne répond plus, boucle principale à plusieurs secondes voire dizaines de secondes). Le
+challenge Digest est donc **mis en cache par appareil** (`struct CacheDigestEnergyMe` dans
+`EnergyMe.h`, un compteur `nc` incrémenté à chaque requête) : une seule requête réseau par
+lecture en régime normal, le handshake complet n'étant refait qu'au premier appel ou si le
+nonce en cache est refusé (périmé). Le `struct` est dans son propre `.h` (et pas dans le
+`.ino`) car un type personnalisé utilisé en paramètre de fonction dans un `.ino` casse la
+génération automatique de prototypes de PlatformIO/Arduino s'il n'est pas déjà connu au
+moment où le prototype est inséré en haut du fichier fusionné.
+
+Autre garde-fou ajouté suite au même test : si le WiFi n'est pas connecté (ex: routeur
+retombé en mode point d'accès), une tentative de connexion vers l'IP locale du boîtier peut
+bloquer bien plus longtemps que le timeout demandé (comportement observé du driver WiFi
+ESP32 dans cet état). `LectureEnergyMe()`/`LectureEnergyMe_Triac()` vérifient donc
+`WiFi.status() == WL_CONNECTED` avant toute tentative.
+
+### Champs de configuration
+
+Réutilise `RMSextIP` (déjà utilisé par HomeWizard/ShellyEm/Enphase pour l'IP de
+l'appareil) et `LabelP`/`LabelIT` (§7, même sémantique : nom du canal à extraire dans la
+réponse). Nouveaux champs : `EnergyMeUser`/`EnergyMePwd` (identifiants du boîtier
+principal). Tous regroupés dans la section "Mesures de puissance" de la page Paramètres,
+Maison puis Triac à la suite (à l'origine dispersés entre "Mesures de puissance" et
+"Routeur" lors des premiers ajouts — réorganisés pour rester lisibles).
+
+### Triac sur un 2e boîtier EnergyMe indépendant
+
+Comme pour `TopicIT` en MQTT (§7), le Triac peut venir d'un **appareil EnergyMe séparé**
+avec ses propres identifiants : `EnergyMeIP_T`/`EnergyMeUser_T`/`EnergyMePwd_T`, lu sur son
+propre timer (indépendant du rythme de lecture de la Source principale, et indépendant de
+`Source` lui-même — fonctionne même si `Source` n'est pas `EnergyMe`). Utilise son propre
+cache Digest (`CacheEnergyMeTriac`, distinct de `CacheEnergyMePrincipal`). Si
+`EnergyMeIP_T` est laissé vide, le Triac est lu depuis le **même** boîtier que la Source
+principale (une seule requête sert les deux canaux). La fonction `TriacIndependant()`
+(`commonFx.ino`) centralise la condition "Triac disponible indépendamment de Source"
+(`TopicIT` MQTT non vide, ou `LabelIT` non vide avec `Source == "EnergyMe"` ou
+`EnergyMeIP_T` configuré) — utilisée partout où le Triac doit s'afficher/s'enregistrer
+comme en UxIx2 (voir §7).
+
+**Attention** : ne pas renseigner `EnergyMeIP_T` avec la **même** IP que `RMSextIP` avant
+d'avoir réellement un 2e boîtier — cela fait interroger deux fois le même appareil en
+parallèle (deux sessions Digest distinctes) pour rien, puisqu'une seule requête sur le
+boîtier principal donne déjà les deux canaux.
+
+## 9. Fichiers modifiés
 
 `platformio.ini`, `partitions.csv`, `partitions_s3_16mb.csv` (nouveau), `.gitignore`
 (nouveau), `src/EcranLCD.h`, `src/Solar_Router_V17_26.ino`, `src/EnvoiMQTT.ino`,
-`src/Source_MQTT.ino`, `src/Source_EnphaseEnvoy.ino`, `src/Server.ino`, `src/Stockage.ino`,
+`src/Source_MQTT.ino`, `src/Source_EnergyMe.ino` (nouveau), `src/EnergyMe.h` (nouveau),
+`src/Source_EnphaseEnvoy.ino`, `src/Server.ino`, `src/Stockage.ino`, `src/commonFx.ino`,
 `src/PagePara.h`, `src/JS_Para.h`, `src/JS_Brute.h`, `src/EcranLED.ino`.

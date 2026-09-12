@@ -310,6 +310,8 @@ void DeserializeConfiguration(String json) {
   Source = conf["Source"].as<String>();
   RMSextIP = conf["RMSextIP"];
   RMSextIPauto = conf["RMSextIPauto"].isNull() ? RMSextIPauto : conf["RMSextIPauto"];
+  EnergyMeUser = conf["EnergyMeUser"] | EnergyMeUser;
+  EnergyMePwd = conf["EnergyMePwd"] | EnergyMePwd;
   EnphaseUser = conf["EnphaseUser"].as<String>();
   EnphasePwd = conf["EnphasePwd"].as<String>();
   EnphaseSerial = conf["EnphaseSerial"].as<String>();
@@ -325,6 +327,9 @@ void DeserializeConfiguration(String json) {
   LabelP = conf["LabelP"] | LabelP;
   TopicIT = conf["TopicIT"] | TopicIT;
   LabelIT = conf["LabelIT"] | LabelIT;
+  EnergyMeIP_T = conf["EnergyMeIP_T"] | EnergyMeIP_T;
+  EnergyMeUser_T = conf["EnergyMeUser_T"] | EnergyMeUser_T;
+  EnergyMePwd_T = conf["EnergyMePwd_T"] | EnergyMePwd_T;
   subMQTT = conf["subMQTT"];
   nomRouteur = conf["nomRouteur"].as<String>();
   nomSondeFixe = conf["nomSondeFixe"].as<String>();
@@ -443,6 +448,8 @@ String SerializeConfiguration() {
   conf["pTemp"] = pTemp;
   conf["Source"] = Source;
   conf["RMSextIP"] = RMSextIP;
+  conf["EnergyMeUser"] = EnergyMeUser;
+  conf["EnergyMePwd"] = EnergyMePwd;
   conf["RMSextIPauto"] = RMSextIPauto;
   conf["EnphaseUser"] = EnphaseUser;
   conf["EnphasePwd"] = EnphasePwd;
@@ -463,6 +470,9 @@ String SerializeConfiguration() {
   conf["LabelP"] = LabelP;
   conf["TopicIT"] = TopicIT;
   conf["LabelIT"] = LabelIT;
+  conf["EnergyMeIP_T"] = EnergyMeIP_T;
+  conf["EnergyMeUser_T"] = EnergyMeUser_T;
+  conf["EnergyMePwd_T"] = EnergyMePwd_T;
   conf["subMQTT"] = subMQTT;
   conf["nomRouteur"] = nomRouteur;
   conf["nomSondeFixe"] = nomSondeFixe;
@@ -573,7 +583,7 @@ void Record_Data(String dateAMJ, String MesSage, int16_t HeureCouranteDeci_) {
   }
   String AM_file = "/Mois_Wh_" + dateAMJ.substring(0, 6) + ".csv";
   bool biSonde = false;
-  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0)) biSonde = true;
+  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TriacIndependant())) biSonde = true;
 
   String New_Record_Conf = "Date";
 

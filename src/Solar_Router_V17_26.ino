@@ -369,6 +369,7 @@
 #include "esp_flash.h"
 #include "CST820.h"
 #include "initGT911.h"
+#include "EnergyMe.h"
 
 
 // Pages WEB
@@ -446,6 +447,14 @@ unsigned long Gateway = 0;
 unsigned long masque = 4294967040;
 unsigned long dns = 0;
 unsigned long RMSextIP = 0;
+//Identifiants pour Source EnergyMe (API REST en authentification HTTP Digest, appareil visé par RMSextIP)
+String EnergyMeUser = "admin";
+String EnergyMePwd = "";
+//2e boîtier EnergyMe optionnel, dédié à la mesure Triac, indépendant de Source (IP/identifiants propres)
+unsigned long EnergyMeIP_T = 0;
+String EnergyMeUser_T = "admin";
+String EnergyMePwd_T = "";
+unsigned long LastEnergyMeTriacMillis = 0;
 unsigned int MQTTRepet = 0;
 unsigned long MQTTIP = 0;
 unsigned int MQTTPort = 1883;
@@ -1467,6 +1476,17 @@ void Task_LectureRMS(void *pvParameters) {
         LastRMS_Millis = millis();
         UpdatePmqtt();
       }
+      if (Source == "EnergyMe") {
+        LectureEnergyMe();
+        LastRMS_Millis = millis();
+        PeriodeProgMillis = 3000 + ralenti;  //Requête HTTP Digest (nonce mis en cache, 1 requête réseau en régime normal)
+      }
+    }
+    //Mesure Triac via un 2e boîtier EnergyMe séparé (IP/identifiants propres), indépendante de Source
+    //et de son rythme de lecture ci-dessus (comme TopicIT pour la mesure Triac via MQTT).
+    if (EnergyMeIP_T > 0 && LabelIT.length() > 0 && tps - LastEnergyMeTriacMillis > 3000) {
+      LastEnergyMeTriacMillis = tps;
+      LectureEnergyMe_Triac();
     }
     delay(2);
   }

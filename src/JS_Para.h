@@ -110,6 +110,8 @@ function SetParaFixe() {
     GID("sources").value = F.Source;
     GID("RMSextIP").value = int2ip(F.RMSextIP);
     GID("RMSextIPauto").checked = F.RMSextIPauto == 1;
+    GID("EnergyMeUser").value = F.EnergyMeUser;
+    GID("EnergyMePwd").value = F.EnergyMePwd;
     GID("EnphaseUser").value = F.EnphaseUser;
     GID("EnphasePwd").value = F.EnphasePwd;
     GID("EnphaseSerial").value = F.EnphaseSerial;
@@ -117,6 +119,9 @@ function SetParaFixe() {
     GID("LabelP").value = F.LabelP;
     GID("TopicIT").value = F.TopicIT;
     GID("LabelIT").value = F.LabelIT;
+    GID("EnergyMeIP_T").value = int2ip(F.EnergyMeIP_T);
+    GID("EnergyMeUser_T").value = F.EnergyMeUser_T;
+    GID("EnergyMePwd_T").value = F.EnergyMePwd_T;
     GID("MQTTRepet").value = F.MQTTRepet;
     GID("MQTTIP").value = int2ip(F.MQTTIP);
     GID("MQTTPort").value = F.MQTTPort;
@@ -207,6 +212,8 @@ function SendValues() {
   }
   F.RMSextIP = ip2int(GID("RMSextIP").value);
   F.RMSextIPauto = GID("RMSextIPauto").checked ? 1 : 0;
+  F.EnergyMeUser = GID("EnergyMeUser").value.trim();
+  F.EnergyMePwd = GID("EnergyMePwd").value.trim();
   F.Gateway = ip2int(GID("gateway").value);
   F.masque = ip2int(GID("masque").value);
   F.dns = ip2int(GID("dns").value);
@@ -233,6 +240,9 @@ function SendValues() {
   F.LabelP = GID("LabelP").value.trim();
   F.TopicIT = GID("TopicIT").value.trim();
   F.LabelIT = GID("LabelIT").value.trim();
+  F.EnergyMeIP_T = ip2int(GID("EnergyMeIP_T").value);
+  F.EnergyMeUser_T = GID("EnergyMeUser_T").value.trim();
+  F.EnergyMePwd_T = GID("EnergyMePwd_T").value.trim();
   F.nomRouteur = GID("nomRouteur").value.trim();
   F.nomSondeFixe = GID("nomSondeFixe").value.trim();
   F.nomSondeMobile = GID("nomSondeMobile").value.trim();
@@ -345,6 +355,9 @@ function checkDisabled() {
     GID("l_wifi_1").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
     GID("l_wifi_TopicIT").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
     GID("l_wifi_LabelIT").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
+    GID("l_wifi_EnergyMeIP_T").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
+    GID("l_wifi_EnergyMeUser_T").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
+    GID("l_wifi_EnergyMePwd_T").style.display = (F.ModeReseau == 2 || F.ModePara == 0) ? "none" : "table-row";
     GID("l_wifi_2").style.display = (F.ModeReseau == 2 || F.ModePara == 0 || F.ESP32_Type == 10) ? "none" : "table-row";
 
     // Visibilité de la liste des routeurs
@@ -426,7 +439,9 @@ function checkDisabled() {
     
     // Visibilité du Topic de Puissance (pour source 11/MQTT)
     GID('ligneTopicP').style.display = (GID("sources").value == "Pmqtt") ? "table-row" : "none";
-    GID('ligneLabelP').style.display = (GID("sources").value == "Pmqtt") ? "table-row" : "none";
+    GID('ligneLabelP').style.display = (GID("sources").value == "Pmqtt" || GID("sources").value == "EnergyMe") ? "table-row" : "none";
+    GID('ligneEnergyMeUser').style.display = (GID("sources").value == "EnergyMe") ? "table-row" : "none";
+    GID('ligneEnergyMePwd').style.display = (GID("sources").value == "EnergyMe") ? "table-row" : "none";
     
     // Mise à jour et appel final
     F.Source = GID("sources").value;
@@ -468,7 +483,8 @@ function checkIP(id) {
  */
 function AdaptationSource() {
     // Visibilité des options de nom (Fixe)
-    const isSourceDual = (V.Source_data === 'UxIx2' || ((V.Source_data === 'ShellyEm' || V.Source_data === 'ShellyPro') && GID("EnphaseSerial").value != 3) || GID("TopicIT").value.trim().length > 0);
+    const hasLabelIT = GID("LabelIT").value.trim().length > 0;
+    const isSourceDual = (V.Source_data === 'UxIx2' || ((V.Source_data === 'ShellyEm' || V.Source_data === 'ShellyPro') && GID("EnphaseSerial").value != 3) || GID("TopicIT").value.trim().length > 0 || (hasLabelIT && (F.Source === 'EnergyMe' || GID("EnergyMeIP_T").value.trim().length > 0)));
     GID('ligneFixe').style.display = isSourceDual ? "table-row" : "none";
     GID('ligneFixe1').style.display = isSourceDual ? "table-row" : "none";
     GID('ligneFixe2').style.display = isSourceDual ? "table-row" : "none";
@@ -488,6 +504,9 @@ function AdaptationSource() {
     switch (F.Source) {
         case 'Enphase':
             txtExt = "Enphase-Envoy";
+            break;
+        case 'EnergyMe':
+            txtExt = "EnergyMe";
             break;
         case 'SmartG':
             txtExt = "SmartGateways";
@@ -513,7 +532,7 @@ function AdaptationSource() {
     GH('label_enphase_shelly', lab_enphaseShelly);
 
     // Visibilité de la ligne d'IP externe/Référence
-    const isExternalSource = ['Ext', 'Enphase', 'SmartG', 'HomeW', 'ShellyEm', 'ShellyPro'].includes(F.Source);
+    const isExternalSource = ['Ext', 'Enphase', 'SmartG', 'HomeW', 'ShellyEm', 'ShellyPro', 'EnergyMe'].includes(F.Source);
     GID('ligneExt').style.display = isExternalSource ? "table-row" : "none";
     GID('ligneExtIPauto').style.display = F.Source === 'Enphase' ? "table-row" : "none";
 

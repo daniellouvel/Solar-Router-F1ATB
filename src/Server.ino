@@ -165,7 +165,7 @@ void handleWifi() {
 }
 void handleMainJS1() {                  // Code Javascript
   String S = "var biSonde=false;\r\n";  // Pour tracer immediatement tableau Mesures
-  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0)) {
+  if (nomSondeFixe != "" && (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TriacIndependant())) {
     S = "var biSonde=true;\r\n";
   }
 
@@ -302,6 +302,12 @@ void handleAjaxRMS() {  // Envoi des dernières données  brutes reçues du RMS
         S += GS + String(Tension_T) + RS + String(Intensite_T) + RS + String(PuissanceS_T - PuissanceI_T) + RS + String(PowerFactor_T) + RS + String(Energie_T_Soutiree) + RS + String(Energie_T_Injectee);
       }
     }
+    if (Source_data == "EnergyMe") {
+      S += GS + String(Tension_M) + RS + String(Intensite_M) + RS + String(PuissanceS_M - PuissanceI_M) + RS + String(PowerFactor_M) + RS + String(Energie_M_Soutiree) + RS + String(Energie_M_Injectee);
+      if (LabelIT.length() > 0) {
+        S += RS + String(Tension_T) + RS + String(Intensite_T) + RS + String(PuissanceS_T - PuissanceI_T) + RS + String(PowerFactor_T) + RS + String(Energie_T_Soutiree) + RS + String(Energie_T_Injectee);
+      }
+    }
   }
 
   server.send(200, "text/html", S);
@@ -415,7 +421,7 @@ void handleAjaxData() {  // Données page d'accueil
   S = "Deb" + RS + DateLast + RS + Source_data + RS + LTARF + RS + STGEt + RS + S + RS + String(Pva_valide);
   S += GS + String(PuissanceS_M) + RS + String(PuissanceI_M) + RS + String(PVAS_M) + RS + String(PVAI_M);
   S += RS + String(EnergieJour_M_Soutiree) + RS + String(EnergieJour_M_Injectee) + RS + String(Energie_M_Soutiree) + RS + String(Energie_M_Injectee);
-  if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0) {  // UxIx2, Shelly monophasé avec 2 sondes, ou mesure Triac via MQTT dédié
+  if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TriacIndependant()) {  // UxIx2, Shelly monophasé avec 2 sondes, ou mesure Triac via MQTT dédié
     S += GS + String(PuissanceS_T) + RS + String(PuissanceI_T) + RS + String(PVAS_T) + RS + String(PVAI_T);
     S += RS + String(EnergieJour_T_Soutiree) + RS + String(EnergieJour_T_Injectee) + RS + String(Energie_T_Soutiree) + RS + String(Energie_T_Injectee);
   } else {
@@ -427,7 +433,7 @@ void handleAjaxData() {  // Données page d'accueil
     + RS + String(Tension_M1) + RS + String(Intensite_M1)
     + RS + String(Tension_M2) + RS + String(Intensite_M2)
     + RS + String(Tension_M3) + RS + String(Intensite_M3);
-	if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TopicIT.length() > 0) {  // UxIx2, Shelly monophasé avec 2 sondes, ou mesure Triac via MQTT dédié
+	if (Source_data == "UxIx2" || ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3) || TriacIndependant()) {  // UxIx2, Shelly monophasé avec 2 sondes, ou mesure Triac via MQTT dédié
     S += RS + String(Tension_T) + RS + String(Intensite_T) ;
 	}
 // --- FIN ---

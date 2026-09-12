@@ -269,7 +269,7 @@ void sendMQTTDiscoveryMsg_global() {
   String ActionOnOff;
   // augmente la taille du buffer wifi Mqtt (voir PubSubClient.h)
   clientMQTT.setBufferSize(1700);  // voir -->#define MQTT_MAX_PACKET_SIZE 256 is the default value in PubSubClient.h
-  if (Source == "UxIx2" || Source == "ShellyEm" || Source == "ShellyPro" || TopicIT.length() > 0) {
+  if (Source == "UxIx2" || Source == "ShellyEm" || Source == "ShellyPro" || TriacIndependant()) {
     DeviceToDiscover("PuissanceS_T", "Puissance T Soutirée", "W", "power", "0");
     DeviceToDiscover("PuissanceI_T", "Puissance T Injectée", "W", "power", "0");
     DeviceToDiscover("Tension_T", "Tension T", "V", "voltage", "2");
@@ -449,7 +449,7 @@ void SendDataToHomeAssistant() {
   // On garde trace de la position
   int len = snprintf(value, sizeof(value), "{\"PuissanceS_M\": %d, \"PuissanceI_M\": %d, \"Tension_M\": %.1f, \"Intensite_M\": %.1f, \"PowerFactor_M\": %.2f, \"Energie_M_Soutiree\":%ld,\"Energie_M_Injectee\":%ld, \"EnergieJour_M_Soutiree\":%ld, \"EnergieJour_M_Injectee\":%ld", PuissanceS_M, PuissanceI_M, Tension_M, Intensite_M, PowerFactor_M, Energie_M_Soutiree, Energie_M_Injectee, EnergieJour_M_Soutiree, EnergieJour_M_Injectee);
 
-  if (Source == "UxIx2" || Source == "ShellyEm" || Source == "ShellyPro" || TopicIT.length() > 0) {
+  if (Source == "UxIx2" || Source == "ShellyEm" || Source == "ShellyPro" || TriacIndependant()) {
     len += snprintf(value + len, sizeof(value) - len, ",\"PuissanceS_T\": %d, \"PuissanceI_T\": %d, \"Tension_T\": %.1f, \"Intensite_T\": %.1f, \"PowerFactor_T\": %.2f, \"Energie_T_Soutiree\":%ld,\"Energie_T_Injectee\":%ld, \"EnergieJour_T_Soutiree\":%ld, \"EnergieJour_T_Injectee\":%ld, \"Frequence\":%.2f", PuissanceS_T, PuissanceI_T, Tension_T, Intensite_T, PowerFactor_T, Energie_T_Soutiree, Energie_T_Injectee, EnergieJour_T_Soutiree, EnergieJour_T_Injectee, Frequence);
   }
   for (int canal = 0; canal < 4; canal++) {

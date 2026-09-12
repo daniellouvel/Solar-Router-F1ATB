@@ -103,16 +103,6 @@ const char *ParaHtml = R"====(
                 onclick="checkDisabled();">
         </div>
 
-        <div class="ligne" id="l_wifi_TopicIT">
-          <label for="TopicIT">MQTT Topic Intensité Triac <small>(capteur séparé, optionnel, indépendant de la Source)</small> :</label>
-          <input type="text" id="TopicIT" name="TopicIT" onchange="checkDisabled();" autocomplete="on">
-        </div>
-
-        <div class="ligne" id="l_wifi_LabelIT">
-          <label for="LabelIT">Nom du canal dans le message JSON <small>(si plusieurs canaux, ex: "Cumulus")</small> :</label>
-          <input type="text" id="LabelIT" name="LabelIT" autocomplete="on">
-        </div>
-
         <div class="ligne" id="l_wifi_2">
           <label for="WifiSleep">
             Wifi Sleep/veille <small>(réduit la consommation mais ralentit la communication)</small> 
@@ -370,6 +360,7 @@ const char *ParaHtml = R"====(
             <option value="ShellyPro">Shelly Pro Em</option>
             <option value="Ext">ESP Externe</option>
             <option value="Pmqtt">MQTT</option>
+            <option value="EnergyMe">EnergyMe</option>
           </select>
         </div>
 
@@ -385,6 +376,16 @@ const char *ParaHtml = R"====(
           <label for="RMSextIPauto">Adresse IP auto par résolution mDNS :</label>
           <input type="checkbox" id="RMSextIPauto" name="RMSextIPauto" style="width:25px;" >
         </div>
+
+        <div class="ligne" id="ligneEnergyMeUser">
+          <label for="EnergyMeUser">EnergyMe Utilisateur :</label>
+          <input type="text" id="EnergyMeUser" name="EnergyMeUser" autocomplete="on">
+        </div>
+        <div class="ligne" id="ligneEnergyMePwd">
+          <label for="EnergyMePwd">EnergyMe Mot de passe :</label>
+          <input type="password" id="EnergyMePwd" name="EnergyMePwd" autocomplete="on">
+        </div>
+
         <div class="ligne" id="ligneEnphaseUser">
           <label for="EnphaseUser">Enphase Envoy-S metered User :
             <span class="fsize10"><br>Pour firmware Envoy-S V7 seulement</span>
@@ -413,6 +414,31 @@ const char *ParaHtml = R"====(
         <div class="ligne" id="ligneLabelP">
           <label for="LabelP">Nom du canal dans le message JSON <small>(si plusieurs canaux, laisser vide pour le format simple {"Pw":...})</small> :</label>
           <input type="text" id="LabelP" name="LabelP" autocomplete="on">
+        </div>
+
+        <div class="boldT" style="margin-top:10px;">Mesure Triac (optionnelle, indépendante de la Source ci-dessus)</div>
+
+        <div class="ligne" id="l_wifi_TopicIT">
+          <label for="TopicIT">MQTT Topic Intensité Triac <small>(capteur séparé)</small> :</label>
+          <input type="text" id="TopicIT" name="TopicIT" onchange="checkDisabled();" autocomplete="on">
+        </div>
+
+        <div class="ligne" id="l_wifi_LabelIT">
+          <label for="LabelIT">Nom du canal dans le message JSON <small>(si plusieurs canaux, ex: "Cumulus")</small> :</label>
+          <input type="text" id="LabelIT" name="LabelIT" autocomplete="on">
+        </div>
+
+        <div class="ligne" id="l_wifi_EnergyMeIP_T">
+          <label for="EnergyMeIP_T">2e boîtier EnergyMe dédié au Triac <small>(adresse IP, optionnel : laisser vide si le Triac est lu sur le même boîtier que la Source)</small> :</label>
+          <input type="text" id="EnergyMeIP_T" name="EnergyMeIP_T" autocomplete="on">
+        </div>
+        <div class="ligne" id="l_wifi_EnergyMeUser_T">
+          <label for="EnergyMeUser_T">Utilisateur du 2e boîtier :</label>
+          <input type="text" id="EnergyMeUser_T" name="EnergyMeUser_T" autocomplete="on">
+        </div>
+        <div class="ligne" id="l_wifi_EnergyMePwd_T">
+          <label for="EnergyMePwd_T">Mot de passe du 2e boîtier :</label>
+          <input type="password" id="EnergyMePwd_T" name="EnergyMePwd_T" autocomplete="on">
         </div>
 
         <div><span class="fsize10">Nécessite un Restart de l'ESP32</span></div>
