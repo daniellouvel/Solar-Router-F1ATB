@@ -18,13 +18,16 @@ function order across `.ino` files generally doesn't matter, but keep new code i
 existing `.ino`/`.h` files rather than introducing new top-level files unless there's a real
 reason to.
 
-Two environments are defined in `platformio.ini`:
+Three environments are defined in `platformio.ini`:
 - `esp32s3_n16r8` — the target hardware (ESP32-S3, 16MB flash, 8MB octal PSRAM). Uses
   `partitions_s3_16mb.csv` (6MB per OTA app slot).
 - `esp32c3_supermini` — an interim test board (ESP32-C3 SuperMini, 4MB flash, no display) used
   while the S3 hardware isn't available. Uses the root `partitions.csv`, which has only a
   **single** app partition (no A/B OTA) because the compiled firmware (~1.97MB) doesn't fit
   two 1900K OTA slots on 4MB of flash.
+- `esp32dev` — classic ESP32 (Wroom), the project's original target, kept because an existing
+  router on this hardware is still in use. No board-specific quirks; this is the architecture
+  everything else (EMAC, `HSPI_HOST`/`VSPI_HOST`) was written against before the S3/C3 port.
 
 ```
 pio run -e esp32s3_n16r8                                   # build
